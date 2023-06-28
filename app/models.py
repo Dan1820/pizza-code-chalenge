@@ -4,12 +4,15 @@ db = SQLAlchemy()
 
 
 class Restaurant(db.Model):
-    __tablename__ = 'Restaurant'
+    __tablename__ = 'restaurant'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     address = db.Column(db.String(255), nullable=False)
     pizzas = db.relationship('Pizza', secondary='restaurant_pizza')
+
+    def __repr__(self):
+        return f'<Restaurant {self.name} for {self.address}>'
 
 
 class Pizza(db.Model):
@@ -20,6 +23,9 @@ class Pizza(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
     restaurants = db.relationship('Restaurant', secondary='restaurant_pizza')
+
+    def __repr__(self):
+        return f'<Pizza {self.name} for {self.ingredients}>'
 
 
 class RestaurantPizza(db.Model):
@@ -35,6 +41,8 @@ class RestaurantPizza(db.Model):
         'restaurant_pizza', cascade='all, delete-orphan'))
     pizza = db.relationship('Pizza', backref=db.backref(
         'restaurant_pizza', cascade='all, delete-orphan'))
+    # def __repr__(self):
+    #     return f'<RestaurantPizza {self.title} for {self.platform}>'
 
 
 # add any models you may need.
