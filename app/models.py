@@ -1,4 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import validates
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+connection_string = "sqlite:///database.db"
+db = create_engine(connection_string)
+base = declarative_base()
 
 db = SQLAlchemy()
 
@@ -41,8 +48,18 @@ class RestaurantPizza(db.Model):
         'restaurant_pizza', cascade='all, delete-orphan'))
     pizza = db.relationship('Pizza', backref=db.backref(
         'restaurant_pizza', cascade='all, delete-orphan'))
-    # def __repr__(self):
-    #     return f'<RestaurantPizza {self.title} for {self.platform}>'
+
+    @validates('price')
+    def validate_email(self, key, restaurant_pizzas):
+        if restaurant_pizzas.price not in range(1, 30):
+            raise ValueError("please enter price between 1 and 30")
+        return restaurant_pizzas.price
+
+
+Session = sessionmaker(db)
+session = Session()
+# def __repr__(self):
+#     return f'<RestaurantPizza {self.title} for {self.platform}>'
 
 
 # add any models you may need.
